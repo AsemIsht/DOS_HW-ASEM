@@ -8,9 +8,10 @@ url = 'http://192.168.121.134:5000'
 
 @app.route('/')
 def hello_world():
-    response = json.loads(requests.get(url).content)
-    print (response["age"])
-    return (str(response["age"]+1))
+    # response = json.loads(requests.get(url).content)
+    # print (response["age"])
+    # return (str(response["age"]+1))
+    return "ss"
 
 @app.route('/search/<topic>')
 def search(topic):
