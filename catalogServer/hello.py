@@ -40,22 +40,55 @@ def hello_world():
     cursor.execute('SELECT * FROM BookTable')
     data = cursor.fetchall()
 
+    db.close()
     return jsonify({"aa":data})
 
-@app.route('/query/<item_number>', methods=['GET']) # item_num // or topic
-def query(item_number):
+# @app.route('/query/<item_number>', methods=['GET']) # item_num // or topic
+# def query(item_number):
+#     var = None
+#     data = None
+#     try:
+#         var = int(item_number) + 0
+#     except TypeError:
+#         var = str(item_number)
+    
+#     if(type(var) is int):
+#         cursor.execute('SELECT id FROM BookTable')
+#         data = cursor.fetchall()
+        
+#     return (str(data))
+
+@app.route('/query_by_topic/<topic>', methods=['GET']) # item_num // or topic
+def query_by_topic(topic):
+    db = sqlite3.connect('catalogDB.db')
+    cursor = db.cursor()
+
+    var = None
+    data = None
+    var = str(topic)
+
+    cursor.execute('SELECT * FROM BookTable where topic = "%s"' %(var))
+    data = cursor.fetchall()
+    
+    db.close()
+    return (jsonify(data))
+
+@app.route('/query_by_item_number/<item_number>', methods=['GET']) # item_num // or topic
+def query_by_item_number(item_number):
+    db = sqlite3.connect('catalogDB.db')
+    cursor = db.cursor()
     var = None
     data = None
     try:
         var = int(item_number) + 0
-    except TypeError:
-        var = str(item_number)
+    except:
+        return ("error type")
     
     if(type(var) is int):
-        cursor.execute('SELECT id FROM BookTable')
+        cursor.execute('SELECT * FROM BookTable where id = "%s"' %(item_number))
         data = cursor.fetchall()
         
-    return (str(data))
+    return (jsonify(data))
 
 @app.route('/update/<item_number>', methods=['GET', 'POST']) #post
 def update(item_number):
