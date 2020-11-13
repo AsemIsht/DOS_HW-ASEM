@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Asem_HW DOS</title>
+<style>
+    table {
+      font-family: arial, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    
+    td, th {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #dddddd;
+    }
+    .footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: rgb(185, 124, 255);
+    color: white;
+    text-align: center;
+    }
+    </style>
+</head>
+<body>
+
+    <table>
+        <tr>
+          <th>id</th>
+          <th>title</th>
+        </tr>
+        {% if len %}
+        {%for i in range(0, len)%} 
+        <tr>
+          <td>{{row[i][0]}}</td>
+          <td>{{row[i][1]}}</td>
+        </tr>
+        {%endfor%} 
+        {% else %}
+        <tr><td colspan='3' style="text-align: center;">Not a valid topic</td></tr>
+        {% endif %}
+      </table>
+
+      <!-- <div class="footer">
+        <p>Footer</p>
+      </div> -->
+      
+</body>
+        
+        
+</html>
