@@ -13,7 +13,7 @@ def hello_world():
     db = sqlite3.connect('catalogDB.db')
     cursor = db.cursor()
 
-    return "jsonify(a)"
+    return jsonify({"aa":"jsonify(a)"})
 
 @app.route('/query/<item_number>')
 def query(item_number):
