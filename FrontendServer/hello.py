@@ -4,14 +4,14 @@ import json
 
 app = Flask(__name__)
 
-url = 'http://192.168.121.134:5000'
+url_catalog = 'http://192.168.121.134:5000'
+url_order = 'http://192.168.121.135:5000'
 
+url = url_order
 @app.route('/')
 def hello_world():
-    # response = json.loads(requests.get(url).content)
-    # print (response["age"])
-    # return (str(response["age"]+1))
-    return "ss"
+    response = json.loads(requests.get(url).content)
+    return (str(response["aa"]))
 
 @app.route('/search/<topic>')
 def search(topic):

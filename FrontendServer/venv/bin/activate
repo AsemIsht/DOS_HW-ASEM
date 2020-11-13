@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/home/asem3/Desktop/FrontendServer/venv"
+VIRTUAL_ENV="/home/asem3/Desktop/DOS_HW ASEM/FrontendServer/venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
