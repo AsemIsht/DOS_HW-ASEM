@@ -29,7 +29,7 @@ end
 # unset irrelevant variables
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/home/asem3/Desktop/FrontendServer/venv"
+set -gx VIRTUAL_ENV "/home/asem3/Desktop/DOS_HW ASEM/FrontendServer/venv"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH
