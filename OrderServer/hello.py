@@ -10,8 +10,7 @@ def ass():
 
 @app.route('/')
 def hello_world():
-
-    return "jsonify(a)"
+    return jsonify({"aa":"jsonify(a)"})
 
 @app.route('/query/<item_number>')
 def query(item_number):
