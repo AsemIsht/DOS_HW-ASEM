@@ -97,11 +97,11 @@ def query_by_item_number(item_number):
     db.close()
     return (jsonify({"data":data}))
 
-@app.route('/update/<item_number>', methods=['POST']) #post
+@app.route('/update/<item_number>', methods=['PUT']) #post
 def update(item_number):
     newPrice = None
     newQuantity = None
-    if request.method == 'POST':
+    if request.method == 'PUT':
         try:
             newPrice = int(request.form['newPrice'])
         except:
