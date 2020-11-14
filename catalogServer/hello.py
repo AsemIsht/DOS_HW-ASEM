@@ -35,13 +35,16 @@ def hello_world():
     #     title,quantity,price,topic)
     #     VALUES("Cooking for the Impatient Graduate Student.",2,30,"Graduate school")''')
 
+    #db.commit()
+
+    cursor.execute('UPDATE BookTable SET quantity = "%s"' %(str(5)))
     db.commit()
 
     cursor.execute('SELECT * FROM BookTable')
     data = cursor.fetchall()
 
     db.close()
-    return jsonify({"aa":data})
+    return jsonify(data)
 
 # @app.route('/query/<item_number>', methods=['GET']) # item_num // or topic
 # def query(item_number):
@@ -71,7 +74,7 @@ def query_by_topic(topic):
     data = cursor.fetchall()
     
     db.close()
-    return (jsonify(data))
+    return (jsonify({"data":data}))
 
 @app.route('/query_by_item_number/<item_number>', methods=['GET']) # item_num // or topic
 def query_by_item_number(item_number):
@@ -82,19 +85,45 @@ def query_by_item_number(item_number):
     try:
         var = int(item_number) + 0
     except:
-        return ("error type")
+        return (jsonify({"data":"Error type"}))
     
     if(type(var) is int):
         cursor.execute('SELECT * FROM BookTable where id = "%s"' %(item_number))
         data = cursor.fetchall()
-        
-    return (jsonify(data))
+    
+    if(len(data) == 0):
+        return (jsonify({"data":"Not an ID"}))
 
-@app.route('/update/<item_number>', methods=['GET', 'POST']) #post
+    db.close()
+    return (jsonify({"data":data}))
+
+@app.route('/update/<item_number>', methods=['PUT']) #post
 def update(item_number):
-    x = ''
-    if request.method == 'POST':
-        x = request.form['newPrice']
-        print (x)
+    newPrice = None
+    newQuantity = None
+    if request.method == 'PUT':
+        try:
+            newPrice = int(request.form['newPrice'])
+        except:
+            newPrice = None
         
-    return (jsonify({'ass':item_number + x}))
+        try:
+            newQuantity = int(request.form['newQuantity'])
+        except:
+            newQuantity = None
+    
+    print (newPrice)
+    print (newQuantity)
+
+    db = sqlite3.connect('catalogDB.db')
+    cursor = db.cursor()
+
+    #cursor.execute('SELECT * FROM BookTable where id = "%s"' %(item_number))
+    #data = cursor.fetchall()
+    
+    
+    cursor.execute('UPDATE BookTable SET quantity = "%s" WHERE id = "%s"' %(newQuantity,int(item_number)))
+    db.commit()
+
+    db.close()
+    return (jsonify({'status':'success'}))
