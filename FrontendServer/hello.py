@@ -38,7 +38,7 @@ def lookup(item_number):
 @app.route('/buy/<item_number>')
 def buy(item_number):
 
-    response = json.loads(requests.put(url_order+'/buy/' + item_number).content)
+    response = json.loads(requests.post(url_order+'/buy/' + item_number).content)
     
 
     # newPrice = {'newPrice' : 50}
