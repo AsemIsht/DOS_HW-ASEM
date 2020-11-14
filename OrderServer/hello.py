@@ -14,7 +14,7 @@ url = 'http://192.168.121.134:5000'
 #     return jsonify({"aa":"jsonify(a)"})
 
 
-@app.route('/buy/<item_number>', methods=['PUT'])
+@app.route('/buy/<item_number>', methods=['POST'])
 def buy(item_number):
     
     response = json.loads(requests.get(url+'/query_by_item_number/' + item_number).content)
@@ -28,7 +28,7 @@ def buy(item_number):
 
     if (response['data'][0][2] > 0):
         new_data = {'newPrice' : response['data'][0][3], 'newQuantity' : response['data'][0][2]-1}
-        response2 = requests.post(url+'/update/' + item_number, data = new_data)
+        response2 = requests.put(url+'/update/' + item_number, data = new_data)
         if(json.loads(response2.content)['status'] == 'success'):
             return (jsonify({"status" : "success", "id" : response['data'][0][0], "name": response['data'][0][1]}))
         else:
