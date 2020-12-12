@@ -39,13 +39,11 @@
           <th>price</th>
         </tr>
         {% if len %}
-        {%for i in range(0, len)%} 
         <tr>
-          <td>{{row[i][1]}}</td>
-          <td>{{row[i][2]}}</td>
-          <td>{{row[i][3]}}</td>
+          <td>{{row[1]}}</td>
+          <td>{{row[2]}}</td>
+          <td>{{row[3]}}</td>
         </tr>
-        {%endfor%} 
         {% else %}
         <tr><td colspan='3' style="text-align: center;">Not a valid ID</td></tr>
         {% endif %}
