@@ -17,24 +17,24 @@ url = 'http://192.168.121.134:5000'
 @app.route('/buy/<item_number>', methods=['POST'])
 def buy(item_number):
     
-    response = json.loads(requests.get(url+'/query_by_item_number/' + item_number).content)
+    response = json.loads(requests.get(url+'/query_by_item_number/' + item_number).content) #first get request to catalog to get the qty
     response2 = None
 
-    if (response['data'] == "Not an ID"):
+    if (response['data'] == "Not an ID"):#item_number doesnt an exist
         return (jsonify({"status" : "Not an ID"}))
-    if (response['data'] == "Error type"):
+    if (response['data'] == "Error type"):#item_number type error
         return (jsonify({"status" : "Error type"}))
 
 
-    if (response['data'][0][2] > 0):
-        new_data = {'newPrice' : response['data'][0][3], 'newQuantity' : response['data'][0][2]-1}
-        response2 = requests.put(url+'/update/' + item_number, data = new_data)
-        if(json.loads(response2.content)['status'] == 'success'):
-            return (jsonify({"status" : "success", "id" : response['data'][0][0], "name": response['data'][0][1]}))
+    if (response['data'][0][2] > 0): #if qty > 0
+        new_data = {'newPrice' : response['data'][0][3], 'newQuantity' : response['data'][0][2]-1}#repearing data to parse to update request
+        response2 = requests.put(url+'/update/' + item_number, data = new_data)#second request to decrement qty
+        if(json.loads(response2.content)['status'] == 'success'):#status of update response is success 
+            return (jsonify({"status" : "success", "id" : response['data'][0][0], "name": response['data'][0][1]})) #response to frontend
         else:
             return (jsonify({"status" : "fail", "id" : response['data'][0][0], "name": response['data'][0][1]}))
     else:
-        return (jsonify({"status" : "outOfStock", "id" : response['data'][0][0], "name": response['data'][0][1]}))
+        return (jsonify({"status" : "outOfStock", "id" : response['data'][0][0], "name": response['data'][0][1]}))#response to frontend that out of stock
 
 
 

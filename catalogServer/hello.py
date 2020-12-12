@@ -12,14 +12,14 @@ def ass():
 def hello_world():
     db = sqlite3.connect('catalogDB.db')
     cursor = db.cursor()
-    data = None
+    data = None#next line is creation of booktable
     cursor.execute('''CREATE TABLE IF NOT EXISTS BookTable(
                                            id INTEGER PRIMARY KEY AUTOINCREMENT, 
                                            title TEXT,
                                            quantity INTEGER,
                                            price INTEGER,
                                            topic TEXT)''')
-    
+    #next lines is to insert the initial values of booktable
     # cursor.execute('''INSERT INTO BookTable(
     #     title,quantity,price,topic)
     #     VALUES("How to get a good grade in DOS in 20 minutes a day.",1,20,"Distributed systems")''')
@@ -37,15 +37,16 @@ def hello_world():
 
     #db.commit()
 
-    cursor.execute('UPDATE BookTable SET quantity = "%s"' %(str(5)))
+    cursor.execute('UPDATE BookTable SET quantity = "%s"' %(str(5)))#this line I use it for recharge the stock
     db.commit()
 
-    cursor.execute('SELECT * FROM BookTable')
+    cursor.execute('SELECT * FROM BookTable') #to debuging only -> represent all table entries
     data = cursor.fetchall()
 
     db.close()
     return jsonify(data)
 
+#I can put these lines (service) insted of two next services 
 # @app.route('/query/<item_number>', methods=['GET']) # item_num // or topic
 # def query(item_number):
 #     var = None
@@ -61,19 +62,19 @@ def hello_world():
         
 #     return (str(data))
 
-@app.route('/query_by_topic/<topic>', methods=['GET']) # item_num // or topic
+@app.route('/query_by_topic/<topic>', methods=['GET']) # query by topic
 def query_by_topic(topic):
-    db = sqlite3.connect('catalogDB.db')
-    cursor = db.cursor()
+    db = sqlite3.connect('catalogDB.db') #connect to sqlite DB
+    cursor = db.cursor() #cursor pointing to DB
 
     var = None
     data = None
     var = str(topic)
 
-    cursor.execute('SELECT * FROM BookTable where topic = "%s"' %(var))
+    cursor.execute('SELECT * FROM BookTable where topic = "%s"' %(var)) #var contain topic string
     data = cursor.fetchall()
     
-    db.close()
+    db.close() #close DB
     return (jsonify({"data":data}))
 
 @app.route('/query_by_item_number/<item_number>', methods=['GET']) # item_num // or topic
@@ -82,28 +83,28 @@ def query_by_item_number(item_number):
     cursor = db.cursor()
     var = None
     data = None
-    try:
+    try:#to check if input is another else than int --> wrong
         var = int(item_number) + 0
     except:
         return (jsonify({"data":"Error type"}))
     
-    if(type(var) is int):
+    if(type(var) is int): #integer --> ok
         cursor.execute('SELECT * FROM BookTable where id = "%s"' %(item_number))
         data = cursor.fetchall()
     
-    if(len(data) == 0):
+    if(len(data) == 0): #didnt find this id on DB
         return (jsonify({"data":"Not an ID"}))
 
     db.close()
     return (jsonify({"data":data}))
 
-@app.route('/update/<item_number>', methods=['PUT']) #post
+@app.route('/update/<item_number>', methods=['PUT'])
 def update(item_number):
     newPrice = None
     newQuantity = None
     if request.method == 'PUT':
         try:
-            newPrice = int(request.form['newPrice'])
+            newPrice = int(request.form['newPrice'])#to be sure that input is on right type
         except:
             newPrice = None
         
@@ -112,8 +113,6 @@ def update(item_number):
         except:
             newQuantity = None
     
-    print (newPrice)
-    print (newQuantity)
 
     db = sqlite3.connect('catalogDB.db')
     cursor = db.cursor()
@@ -122,7 +121,7 @@ def update(item_number):
     #data = cursor.fetchall()
     
     
-    cursor.execute('UPDATE BookTable SET quantity = "%s" WHERE id = "%s"' %(newQuantity,int(item_number)))
+    cursor.execute('UPDATE BookTable SET quantity = "%s" WHERE id = "%s"' %(newQuantity,int(item_number)))#SQLite Query
     db.commit()
 
     db.close()
