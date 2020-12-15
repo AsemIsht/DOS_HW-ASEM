@@ -120,6 +120,7 @@ def query_by_item_number(item_number):
     gath_of_id_requested(item_number)
     ##############
 
+    print("query_by_item_number")
     print(id_array)
     db.close()
     return (jsonify({"data":data}))
@@ -155,6 +156,7 @@ def update(item_number):
     push_invalidate(int(item_number))
 
 
+    print("update")
     print(id_array)
     db.close()
     return (jsonify({'status':'success','newQuantity':newQuantity}))
