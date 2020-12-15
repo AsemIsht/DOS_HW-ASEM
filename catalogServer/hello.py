@@ -5,8 +5,46 @@ import sqlite3
 
 app = Flask(__name__)
 
-def ass():
-    return ("ss")
+id_array = []
+url_catalog_replica = 'http://192.168.121.142:5000'
+def gath_of_id_requested(item_number):
+    index = -1
+    exist_ip = False
+    for i in range(len(id_array)):
+        if(int(id_array[i][0]) == int(item_number)):
+            index = i
+
+    if( index != -1):
+        for i in range(1,len(id_array[index])):
+            if (str(id_array[index][i]) == str(request.remote_addr)):
+                exist_ip = True
+        if(exist_ip == False):
+            id_array[index].append(request.remote_addr)
+    else:
+        item0 = [int(item_number)]
+        id_array.append(item0)
+        id_array[len(id_array)-1].append(request.remote_addr)
+
+    return ({"ss":id_array})
+
+def push_invalidate(item_number):
+    index = -1
+
+    for i in range(len(id_array)):
+        if(int(id_array[i][0]) == int(item_number)):
+            index = i
+
+    if(index != -1):
+        if (len(id_array[index])!=0):
+            for i in range(1,len(id_array[index])):
+                requests.delete('http://'+str(id_array[index][i])+':5000/invalidate/' + str(item_number))
+            id_array.pop(index)
+    return (jsonify({"data":"data"}))
+
+@app.before_first_request
+def activate_job():
+    print("STARTSTARTSTART")
+
 
 @app.route('/')
 def hello_world():
@@ -46,22 +84,6 @@ def hello_world():
     db.close()
     return jsonify(data)
 
-#I can put these lines (service) insted of two next services 
-# @app.route('/query/<item_number>', methods=['GET']) # item_num // or topic
-# def query(item_number):
-#     var = None
-#     data = None
-#     try:
-#         var = int(item_number) + 0
-#     except TypeError:
-#         var = str(item_number)
-    
-#     if(type(var) is int):
-#         cursor.execute('SELECT id FROM BookTable')
-#         data = cursor.fetchall()
-        
-#     return (str(data))
-
 @app.route('/query_by_topic/<topic>', methods=['GET']) # query by topic
 def query_by_topic(topic):
     db = sqlite3.connect('catalogDB.db') #connect to sqlite DB
@@ -94,7 +116,12 @@ def query_by_item_number(item_number):
     
     if(len(data) == 0): #didnt find this id on DB
         return (jsonify({"data":"Not an ID"}))
+    ###############
+    gath_of_id_requested(item_number)
+    ##############
 
+    print("query_by_item_number")
+    print(id_array)
     db.close()
     return (jsonify({"data":data}))
 
@@ -102,16 +129,17 @@ def query_by_item_number(item_number):
 def update(item_number):
     newPrice = None
     newQuantity = None
+    
     if request.method == 'PUT':
         try:
-            newPrice = int(request.form['newPrice'])#to be sure that input is on right type
+            newPrice = (request.form['newPrice'])#to be sure that input is on right type
         except:
-            newPrice = None
+            newPrice = 10
         
         try:
-            newQuantity = int(request.form['newQuantity'])
+            newQuantity = (request.form['newQuantity'])
         except:
-            newQuantity = None
+            newQuantity = 10
     
 
     db = sqlite3.connect('catalogDB.db')
@@ -120,9 +148,44 @@ def update(item_number):
     #cursor.execute('SELECT * FROM BookTable where id = "%s"' %(item_number))
     #data = cursor.fetchall()
     
-    
-    cursor.execute('UPDATE BookTable SET quantity = "%s" WHERE id = "%s"' %(newQuantity,int(item_number)))#SQLite Query
+    cursor.execute('UPDATE BookTable SET quantity = "%s" WHERE id = "%s"' %(str(newQuantity),str(item_number)))#SQLite Query
     db.commit()
 
+    new_data = {'newPrice' : newPrice, 'newQuantity' : newQuantity}
+    requests.put(url_catalog_replica+'/sync/' + item_number, data = new_data) #sync to another replica
+    push_invalidate(int(item_number))
+
+
+    print("update")
+    print(id_array)
     db.close()
-    return (jsonify({'status':'success'}))
+    return (jsonify({'status':'success','newQuantity':newQuantity}))
+
+@app.route('/sync/<item_number>', methods=['PUT'])
+def sync(item_number):
+    newPrice = None
+    newQuantity = None
+    
+    if request.method == 'PUT':
+        try:
+            newPrice = (request.form['newPrice'])#to be sure that input is on right type
+        except:
+            newPrice = 10
+        
+        try:
+            newQuantity = (request.form['newQuantity'])
+        except:
+            newQuantity = 10
+    
+
+    db = sqlite3.connect('catalogDB.db')
+    cursor = db.cursor()
+    
+    cursor.execute('UPDATE BookTable SET quantity = "%s" WHERE id = "%s"' %(str(newQuantity),str(item_number)))#SQLite Query
+    db.commit()
+
+    push_invalidate(int(item_number))
+
+    print(id_array)
+    db.close()
+    return (jsonify({'status':'success','newQuantity':newQuantity}))
