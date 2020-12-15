@@ -4,11 +4,14 @@ from flask import render_template
 import requests
 import json
 
+import time
+
+
 app = Flask(__name__)
 count_catalog = 0
 count_order = 0
-url_catalog = 'http://192.168.121.142:5000'
-url_order = 'http://192.168.121.144:5000'
+url_catalog = 'http://192.168.121.148:5000'
+url_order = 'http://192.168.121.149:5000'
 
 catche0 = []
 url = url_order
@@ -50,6 +53,7 @@ def search(topic):
 
 @app.route('/lookup/<item_number>')
 def lookup(item_number):
+    start_time = time.time()
     global count_catalog
     
     len0 = None #initialization
@@ -86,8 +90,9 @@ def lookup(item_number):
             catche0[index].append(1) #usage
 
     if (len(catche0) == 0): #to prevent out of range array (return row = catche0[index]
+        print (str(time.time() - start_time))
         return (render_template ('items_lookup.html', row = [0], len = len0))#if len0 is 0, print error msg
-
+    print (str(time.time() - start_time))
     return (render_template ('items_lookup.html', row = catche0[index], len = len0))#if len0 is 0, print error msg
     
     
